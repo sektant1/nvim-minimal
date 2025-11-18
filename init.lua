@@ -2,15 +2,15 @@
 vim.cmd([[set mouse=]])
 -- Nunca cria arquivos de swap (.swp).
 vim.cmd([[set noswapfile]])
-
+vim.opt.guicursor = ""
 -- Define as bordas das janelas (splits, float) como arredondadas.
 vim.opt.winborder = "rounded"
 -- Tamanho da tabulação em 2 espaços.
-vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 -- Tamanho do "shift" (autoindent) em 2 espaços.
-vim.opt.shiftwidth = 2
+vim.opt.shiftwidth = 4
 -- Sempre mostrar a barra de abas (tabline), mesmo com uma única aba.
-vim.opt.showtabline = 2
+vim.opt.showtabline = 4
 -- Mostrar a coluna de "sinais" (git, lsp diagnostics).
 vim.opt.signcolumn = "yes"
 -- Desliga o "word wrap" (quebra de linha automática).
@@ -30,49 +30,49 @@ vim.opt.number = true
 
 
 vim.pack.add({
-	-- Temas
-	{ src = "https://github.com/vague2k/vague.nvim" },
-	{ src = "https://github.com/elvessousa/sobrio" },
-	{ src = "https://github.com/darkvoid-theme/darkvoid.nvim" },
-	{ src = "https://github.com/nyoom-engineering/oxocarbon.nvim" },
-	{ src = "https://github.com/michaeljsmith/vim-colours-dark-lord" },
+    -- Temas
+    { src = "https://github.com/vague2k/vague.nvim" },
+    { src = "https://github.com/elvessousa/sobrio" },
+    { src = "https://github.com/darkvoid-theme/darkvoid.nvim" },
+    { src = "https://github.com/nyoom-engineering/oxocarbon.nvim" },
+    { src = "https://github.com/michaeljsmith/vim-colours-dark-lord" },
 
-	-- UI / Utilidades
-	{ src = "https://github.com/chentoast/marks.nvim" },        -- Gerenciador de "marcas" (bookmarks)
-	{ src = "https://github.com/stevearc/oil.nvim" },           -- Gerenciador de arquivos (substituto do netrw)
-	{ src = "https://github.com/nvim-tree/nvim-web-devicons" }, -- Ícones
-	{ src = "https://github.com/aznhe21/actions-preview.nvim" }, -- Preview de code actions
+    -- UI / Utilidades
+    { src = "https://github.com/chentoast/marks.nvim" },         -- Gerenciador de "marcas" (bookmarks)
+    { src = "https://github.com/stevearc/oil.nvim" },            -- Gerenciador de arquivos (substituto do netrw)
+    { src = "https://github.com/nvim-tree/nvim-web-devicons" },  -- Ícones
+    { src = "https://github.com/aznhe21/actions-preview.nvim" }, -- Preview de code actions
 
-	-- Core de Desenvolvimento
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter",        version = "main" }, -- Parser de sintaxe
-	{ src = "https://github.com/neovim/nvim-lspconfig" },                                   -- Configuração base do LSP
-	{ src = "https://github.com/mason-org/mason.nvim" },                                    -- Gerenciador de LSPs e formatters
+    -- Core de Desenvolvimento
+    { src = "https://github.com/nvim-treesitter/nvim-treesitter",        version = "main" }, -- Parser de sintaxe
+    { src = "https://github.com/neovim/nvim-lspconfig" },                                    -- Configuração base do LSP
+    { src = "https://github.com/mason-org/mason.nvim" },                                     -- Gerenciador de LSPs e formatters
 
-	-- Telescope (Fuzzy Finder) e dependências
-	{ src = "https://github.com/nvim-telescope/telescope.nvim",          version = "0.1.8" },
-	{ src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" },
-	{ src = "https://github.com/nvim-lua/plenary.nvim" },     -- Dependência comum (Telescope, etc)
-	{ src = "https://github.com/LinArcX/telescope-env.nvim" }, -- Extensão para variáveis de ambiente
+    -- Telescope (Fuzzy Finder) e dependências
+    { src = "https://github.com/nvim-telescope/telescope.nvim",          version = "0.1.8" },
+    { src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" },
+    { src = "https://github.com/nvim-lua/plenary.nvim" },      -- Dependência comum (Telescope, etc)
+    { src = "https://github.com/LinArcX/telescope-env.nvim" }, -- Extensão para variáveis de ambiente
 
-	-- Snippets
-	{ src = "https://github.com/L3MON4D3/LuaSnip" },
+    -- Snippets
+    { src = "https://github.com/L3MON4D3/LuaSnip" },
 
-	-- Específico
-	{ src = "https://github.com/chomosuke/typst-preview.nvim" }, -- Preview para Typst
+    -- Específico
+    { src = "https://github.com/chomosuke/typst-preview.nvim" }, -- Preview para Typst
 })
 
 -- --- Config: marks.nvim ---
 require "marks".setup {
-	builtin_marks = { "<", ">", "^" },
-	refresh_interval = 250,
-	sign_priority = { lower = 10, upper = 15, builtin = 8, bookmark = 20 },
-	excluded_filetypes = {},
-	excluded_buftypes = {},
-	mappings = {}
+    builtin_marks = { "<", ">", "^" },
+    refresh_interval = 250,
+    sign_priority = { lower = 10, upper = 15, builtin = 8, bookmark = 20 },
+    excluded_filetypes = {},
+    excluded_buftypes = {},
+    mappings = {}
 }
 
 -- --- Tema Padrão ---
-local default_color = "darkvoid"
+local default_color = "sobrio_vim"
 -- vim.o.background = "dark"
 
 -- --- Config: mason.nvim ---
@@ -81,57 +81,57 @@ require "mason".setup()
 -- --- Config: telescope.nvim ---
 local telescope = require("telescope")
 telescope.setup({
-	defaults = {
-		preview = { treesitter = false }, -- Desliga o preview do treesitter (pode ser lento)
-		color_devicons = true,
-		sorting_strategy = "ascending",
-		-- Define bordas arredondadas para o Telescope
-		borderchars = {
-			"─", -- top
-			"│", -- right
-			"─", -- bottom
-			"│", -- left
-			"┌", -- top-left
-			"┐", -- top-right
-			"┘", -- bottom-right
-			"└", -- bottom-left
-		},
-		path_displays = { "smart" },
-		layout_config = {
-			height = 100,
-			width = 400,
-			prompt_position = "top",
-			preview_cutoff = 40,
-		}
-	}
+    defaults = {
+        preview = { treesitter = false }, -- Desliga o preview do treesitter (pode ser lento)
+        color_devicons = true,
+        sorting_strategy = "ascending",
+        -- Define bordas arredondadas para o Telescope
+        borderchars = {
+            "─", -- top
+            "│", -- right
+            "─", -- bottom
+            "│", -- left
+            "┌", -- top-left
+            "┐", -- top-right
+            "┘", -- bottom-right
+            "└", -- bottom-left
+        },
+        path_displays = { "smart" },
+        layout_config = {
+            height = 100,
+            width = 400,
+            prompt_position = "top",
+            preview_cutoff = 40,
+        }
+    }
 })
 -- Carrega a extensão 'ui-select' (para substituir vim.ui.select)
 telescope.load_extension("ui-select")
 
 -- --- Config: actions-preview.nvim ---
 require("actions-preview").setup {
-	backend = { "telescope" },
-	extensions = { "env" },
-	telescope = vim.tbl_extend(
-		"force",
-		require("telescope.themes").get_dropdown(), {}
-	)
+    backend = { "telescope" },
+    extensions = { "env" },
+    telescope = vim.tbl_extend(
+        "force",
+        require("telescope.themes").get_dropdown(), {}
+    )
 }
 
 
 -- --- Autocmd: LspAttach ---
 vim.api.nvim_create_autocmd('LspAttach', {
-	group = vim.api.nvim_create_augroup('my.lsp', {}),
-	callback = function(args)
-		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-		-- Verifica se o servidor suporta "completion"
-		if client:supports_method('textDocument/completion') then
-			-- Opcional: Ativa autocompletion em CADA tecla. Pode ser lento.
-			local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
-			client.server_capabilities.completionProvider.triggerCharacters = chars
-			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-		end
-	end,
+    group = vim.api.nvim_create_augroup('my.lsp', {}),
+    callback = function(args)
+        local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+        -- Verifica se o servidor suporta "completion"
+        if client:supports_method('textDocument/completion') then
+            -- Opcional: Ativa autocompletion em CADA tecla. Pode ser lento.
+            local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
+            client.server_capabilities.completionProvider.triggerCharacters = chars
+            vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+        end
+    end,
 })
 
 -- Opções do menu de autocompletar.
@@ -141,31 +141,31 @@ vim.cmd [[set completeopt+=menuone,noselect,popup]]
 -- Lista de servidores de linguagem que o lspconfig deve iniciar.
 -- (O Mason deve tê-los instalado).
 vim.lsp.enable({
-	"lua_ls", "cssls",
-	"rust_analyzer", "clangd", "ruff",
-	"glsl_analyzer", "hlint",
-	"intelephense", "biome", "tailwindcss",
-	"ts_ls", "emmet_language_server", "emmet_ls", "solargraph"
+    "lua_ls", "cssls",
+    "rust_analyzer", "clangd", "ruff", "neocmakelsp",
+    "glsl_analyzer", "hlint",
+    "intelephense", "biome", "tailwindcss",
+    "ts_ls", "emmet_language_server", "emmet_ls", "solargraph"
 })
 
 
 -- --- Config: oil.nvim ---
 -- Configuração do gerenciador de arquivos.
 require("oil").setup({
-	lsp_file_methods = {
-		enabled = true,
-		timeout_ms = 1000,
-		autosave_changes = true,
-	},
-	columns = {
-		"permissions",
-		"icon",
-	},
-	float = {
-		max_width = 0.7,
-		max_height = 0.6,
-		border = "rounded",
-	},
+    lsp_file_methods = {
+        enabled = true,
+        timeout_ms = 1000,
+        autosave_changes = true,
+    },
+    columns = {
+        "permissions",
+        "icon",
+    },
+    float = {
+        max_width = 0.7,
+        max_height = 0.6,
+        border = "rounded",
+    },
 })
 
 -- --- Config: vague.nvim ---
@@ -180,31 +180,31 @@ require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })
 -- --- Função: pack_clean ---
 -- Função para listar e remover plugins do 'vim.pack' que não estão ativos.
 local function pack_clean()
-	local active_plugins = {}
-	local unused_plugins = {}
+    local active_plugins = {}
+    local unused_plugins = {}
 
-	-- Constrói uma tabela de plugins ativos
-	for _, plugin in ipairs(vim.pack.get()) do
-		active_plugins[plugin.spec.name] = plugin.active
-	end
+    -- Constrói uma tabela de plugins ativos
+    for _, plugin in ipairs(vim.pack.get()) do
+        active_plugins[plugin.spec.name] = plugin.active
+    end
 
-	-- Encontra plugins que não estão na lista de ativos
-	for _, plugin in ipairs(vim.pack.get()) do
-		if not active_plugins[plugin.spec.name] then
-			table.insert(unused_plugins, plugin.spec.name)
-		end
-	end
+    -- Encontra plugins que não estão na lista de ativos
+    for _, plugin in ipairs(vim.pack.get()) do
+        if not active_plugins[plugin.spec.name] then
+            table.insert(unused_plugins, plugin.spec.name)
+        end
+    end
 
-	if #unused_plugins == 0 then
-		print("No unused plugins.")
-		return
-	end
+    if #unused_plugins == 0 then
+        print("No unused plugins.")
+        return
+    end
 
-	-- Pede confirmação antes de remover
-	local choice = vim.fn.confirm("Remove unused plugins?", "&Yes\n&No", 2)
-	if choice == 1 then
-		vim.pack.del(unused_plugins)
-	end
+    -- Pede confirmação antes de remover
+    local choice = vim.fn.confirm("Remove unused plugins?", "&Yes\n&No", 2)
+    if choice == 1 then
+        vim.pack.del(unused_plugins)
+    end
 end
 
 -- Keymap para rodar a função de limpeza
@@ -216,36 +216,36 @@ local color_group = vim.api.nvim_create_augroup("colors", { clear = true })
 
 -- Autocmd para forçar o tema ao carregar...
 vim.api.nvim_create_autocmd("ColorScheme", {
-	group = color_group,
-	callback = function(args)
-		if vim.t.color then
-			vim.cmd("colorscheme " .. vim.t.color)
-		else
-			vim.cmd("colorscheme " .. default_color)
-		end
-	end,
+    group = color_group,
+    callback = function(args)
+        if vim.t.color then
+            vim.cmd("colorscheme " .. vim.t.color)
+        else
+            vim.cmd("colorscheme " .. default_color)
+        end
+    end,
 })
 
 -- ... e ao entrar em uma nova aba (garante consistência).
 vim.api.nvim_create_autocmd("TabEnter", {
-	group = color_group,
-	callback = function(args)
-		if vim.t.color then
-			vim.cmd("colorscheme " .. vim.t.color)
-		else
-			vim.cmd("colorscheme " .. default_color)
-		end
-	end,
+    group = color_group,
+    callback = function(args)
+        if vim.t.color then
+            vim.cmd("colorscheme " .. vim.t.color)
+        else
+            vim.cmd("colorscheme " .. default_color)
+        end
+    end,
 })
 
 -- (Este bloco parece redundante ou incompleto, mas mantido)
 local colors = {}
 vim.api.nvim_create_autocmd("ColorScheme", {
-	group = color_group,
-	callback = function(args)
-		-- vim.cmd("hi statusline guibg=NONE")
-		-- vim.cmd("hi TabLineFill guibg=NONE")
-	end,
+    group = color_group,
+    callback = function(args)
+        -- vim.cmd("hi statusline guibg=NONE")
+        -- vim.cmd("hi TabLineFill guibg=NONE")
+    end,
 })
 
 
@@ -291,7 +291,7 @@ vim.cmd([[
 -- --- Keymaps: Navegação de Abas (Loop) ---
 -- Cria atalhos <Leader>1, <Leader>2, ... <Leader>8
 for i = 1, 8 do
-	map({ "n", "t" }, "<Leader>" .. i, "<Cmd>tabnext " .. i .. "<CR>")
+    map({ "n", "t" }, "<Leader>" .. i, "<Cmd>tabnext " .. i .. "<CR>")
 end
 
 -- --- Keymaps: Conveniência ---
@@ -346,6 +346,9 @@ map({ "n" }, "<M-e>", "<cmd>resize -2<CR>")
 map({ "n" }, "<M-i>", "<cmd>vertical resize +5<CR>")
 map({ "n" }, "<M-m>", "<cmd>vertical resize -5<CR>")
 
+vim.keymap.set("n", "<leader>d", function()
+    vim.diagnostic.open_float()
+end, { desc = "Open diagnostic float" })
 -- --- Keymaps: Plugins ---
 map({ "n" }, "<leader>e", "<cmd>Oil<CR>") -- Abrir Oil (gerenciador de arquivos)
 map({ "n" }, "<leader>c", "1z=")          -- Sugestão de correção (LSP)
@@ -385,11 +388,11 @@ map("v", "L", "$", { silent = true, desc = "End of line" })
 -- --- Autocmd: Filetype JSX/TSX ---
 -- Força o filetype de 'typescriptreact' para arquivos .jsx e .tsx.
 vim.api.nvim_create_autocmd("BufWinEnter", {
-	pattern = "*.jsx,*.tsx",
-	group = vim.api.nvim_create_augroup("TS", { clear = true }),
-	callback = function()
-		vim.cmd([[set filetype=typescriptreact]])
-	end
+    pattern = "*.jsx,*.tsx",
+    group = vim.api.nvim_create_augroup("TS", { clear = true }),
+    callback = function()
+        vim.cmd([[set filetype=typescriptreact]])
+    end
 })
 
 -- --- Carregamento Inicial do Tema ---
@@ -399,27 +402,39 @@ vim.cmd('colorscheme ' .. default_color)
 -- --- Autocmd: Sincronizar PHP (BufWritePost) ---
 -- Roda o script 'gg-repo-sync' automaticamente após salvar um arquivo .php.
 vim.api.nvim_create_autocmd("BufWritePost", {
-	pattern = "*.php",
-	callback = function()
-		vim.fn.jobstart("gg-repo-sync", {
-			on_exit = function(_, exit_code, _)
-				if exit_code == 0 then
-					vim.notify("gg-repo-sync successful", vim.log.levels.INFO)
-				else
-					vim.notify("gg-repo-sync failed", vim.log.levels.ERROR)
-				end
-			end,
-		})
-	end,
+    pattern = "*.php",
+    callback = function()
+        vim.fn.jobstart("gg-repo-sync", {
+            on_exit = function(_, exit_code, _)
+                if exit_code == 0 then
+                    vim.notify("gg-repo-sync successful", vim.log.levels.INFO)
+                else
+                    vim.notify("gg-repo-sync failed", vim.log.levels.ERROR)
+                end
+            end,
+        })
+    end,
 })
 
 local format_on_save_group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-	group = format_on_save_group,
-	pattern = "*", -- Executa em todos os arquivos
-	desc = "Formatar usando LSP antes de salvar",
-	callback = function(args)
-		vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 1500 })
-	end,
+    group = format_on_save_group,
+    pattern = "*", -- Executa em todos os arquivos
+    desc = "Formatar usando LSP antes de salvar",
+    callback = function(args)
+        vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 1500 })
+    end,
 })
+
+local statusline = {
+    ' %t',
+    '%r',
+    '%m',
+    '%=',
+    '%{&filetype}',
+    ' %2p%%',
+    ' %3l:%-2c '
+}
+
+vim.o.statusline = table.concat(statusline, '')
