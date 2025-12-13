@@ -8,6 +8,10 @@
       "rev": "cb938c25edaac38d362555f19244a9cb85d561e8",
       "src": "https://github.com/aznhe21/actions-preview.nvim"
     },
+    "autoclose.nvim": {
+      "rev": "3f86702b54a861a17d7994b2e32a7c648cb12fb1",
+      "src": "https://github.com/m4xshen/autoclose.nvim"
+    },
     "darkvoid.nvim": {
       "rev": "45be993a5617e05811b6b293c05e6aded7003cc9",
       "src": "https://github.com/darkvoid-theme/darkvoid.nvim"
@@ -74,6 +78,10 @@
       "src": "https://github.com/nvim-telescope/telescope.nvim",
       "version": "'0.1.8'"
     },
+    "transparent.nvim": {
+      "rev": "8ac59883de84e9cd1850ea25cf087031c5ba7d54",
+      "src": "https://github.com/xiyaowong/transparent.nvim"
+    },
     "typst-preview.nvim": {
       "rev": "64469f832c4d214683c12e0fceba98055cb1ce3b",
       "src": "https://github.com/chomosuke/typst-preview.nvim"
@@ -82,9 +90,17 @@
       "rev": "dba28050887c2810b5ebf9e0143b4e919bd55757",
       "src": "https://github.com/vague2k/vague.nvim"
     },
+    "vim": {
+      "rev": "837fd7292274e0ee2f3b5aee4519c3f74d7dc3d1",
+      "src": "https://github.com/rainglow/vim"
+    },
     "vim-colours-dark-lord": {
       "rev": "ab1b8cc5af80d6e1f0ebe2c485f44ac81539da1f",
       "src": "https://github.com/michaeljsmith/vim-colours-dark-lord"
+    },
+    "vscode.nvim": {
+      "rev": "aa1102a7e15195c9cca22730b09224a7f7745ba8",
+      "src": "https://github.com/Mofiqul/vscode.nvim"
     },
     "yazi.nvim": {
       "rev": "3e434d9aa8a751f9504fae314f3a6baf6953235c",
