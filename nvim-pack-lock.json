@@ -16,6 +16,10 @@
       "rev": "45be993a5617e05811b6b293c05e6aded7003cc9",
       "src": "https://github.com/darkvoid-theme/darkvoid.nvim"
     },
+    "doom-one.nvim": {
+      "rev": "beae92173315c7282f6897e666cfd67fbf0f3ac9",
+      "src": "https://github.com/NTBBloodbath/doom-one.nvim"
+    },
     "marks.nvim": {
       "rev": "f353e8c08c50f39e99a9ed474172df7eddd89b72",
       "src": "https://github.com/chentoast/marks.nvim"
@@ -97,6 +101,10 @@
     "vim-colours-dark-lord": {
       "rev": "ab1b8cc5af80d6e1f0ebe2c485f44ac81539da1f",
       "src": "https://github.com/michaeljsmith/vim-colours-dark-lord"
+    },
+    "vim-tmux-navigator": {
+      "rev": "c45243dc1f32ac6bcf6068e5300f3b2b237e576a",
+      "src": "https://github.com/christoomey/vim-tmux-navigator"
     },
     "vscode.nvim": {
       "rev": "aa1102a7e15195c9cca22730b09224a7f7745ba8",

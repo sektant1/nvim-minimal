@@ -30,13 +30,15 @@ vim.cmd([[set completeopt+=menuone,noselect,popup]])
 
 vim.cmd([[hi @lsp.type.number gui=italic]])
 
-local default_color = "mintchoc-contrast"
+local default_color = "doom-one"
 
 -- =============================================================================
 --  PLUGINS
 -- =============================================================================
 vim.pack.add({
 	{ src = "https://github.com/vague2k/vague.nvim" },
+	{ src = "https://github.com/christoomey/vim-tmux-navigator" },
+	{ src = "https://github.com/NTBBloodbath/doom-one.nvim" },
 	{ src = "https://github.com/m4xshen/autoclose.nvim" },
 	{ src = "https://github.com/rainglow/vim" },
 	{ src = "https://github.com/xiyaowong/transparent.nvim" },
@@ -88,6 +90,7 @@ local function pack_clean()
 		vim.pack.del(unused_plugins)
 	end
 end
+
 vim.keymap.set("n", "<leader>pc", pack_clean)
 
 -- =============================================================================
@@ -183,6 +186,19 @@ require("mason-lspconfig").setup({
 	},
 })
 
+-- Add color to cursor
+vim.g.doom_one_cursor_coloring = false
+-- Set :terminal colors
+vim.g.doom_one_terminal_colors = false
+-- Enable italic comments
+vim.g.doom_one_italic_comments = false
+-- Enable TS support
+vim.g.doom_one_enable_treesitter = true
+-- Color whole diagnostic text or only underline
+vim.g.doom_one_diagnostics_text_color = false
+-- Enable transparent background
+vim.g.doom_one_transparent_background = true
+
 require("telescope").setup({
 	pickers = {
 		colorscheme = {
@@ -221,6 +237,40 @@ vim.diagnostic.config({
 -- =============================================================================
 -- LSP SETUP & AUTOCOMMANDS
 -- =============================================================================
+local function find_cmake_root(path)
+	local res = vim.fs.find("CMakeLists.txt", {
+		upward = true,
+		path = vim.fs.dirname(path),
+	})
+	return res[1] and vim.fs.dirname(res[1]) or nil
+end
+
+local function sync_project()
+	local buf = vim.api.nvim_get_current_buf()
+	local name = vim.api.nvim_buf_get_name(buf)
+	if name == "" then
+		return
+	end
+
+	local root = find_cmake_root(name)
+	if not root then
+		return
+	end
+
+	-- Neovim cwd
+	vim.cmd("lcd " .. root)
+
+	-- Push to tmux (force + silent)
+	vim.fn.system({
+		"tmux",
+		"set-option",
+		"-gq",
+		"@project_root",
+		root,
+	})
+end
+
+vim.api.nvim_create_autocmd({ "BufEnter", "BufFilePost" }, { callback = sync_project })
 
 vim.lsp.enable({
 	"cssls",
@@ -272,6 +322,12 @@ vim.api.nvim_create_autocmd("TabEnter", {
 		else
 			vim.cmd("colorscheme " .. default_color)
 		end
+	end,
+})
+
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function()
+		vim.cmd("TransparentEnable")
 	end,
 })
 
@@ -343,11 +399,21 @@ map({ "n", "v", "x" }, ":", ";", { desc = "Repeat last f/t" })
 map({ "n", "v", "x" }, "<C-s>", [[:s/\V]], { desc = "Substitute in selection" })
 map({ "n", "v", "x" }, "<leader>n", ":norm ", { desc = "Run normal command" })
 
-map("n", "<leader>b", "<cmd>make<CR>")
-map("n", "<leader>B", "<cmd>make run<CR>")
-map("n", "<leader>C", "<cmd>!cmake -S . -B build<CR>")
-map("n", "<leader>Cb", "<cmd>!cmake --build build<CR>")
-map("n", "<leader>Ct", "<cmd>cd build && ctest<CR>")
+vim.keymap.set("n", "<M-b>", function()
+	vim.fn.system({ "tmux", "send-keys", "M-b" })
+end)
+
+vim.keymap.set("n", "<M-r>", function()
+	vim.fn.system({ "tmux", "send-keys", "M-r" })
+end)
+
+vim.keymap.set("n", "<M-d>", function()
+	vim.fn.system({ "tmux", "send-keys", "M-d" })
+end)
+
+vim.keymap.set("n", "<M-t>", function()
+	vim.fn.system({ "tmux", "send-keys", "M-t" })
+end)
 
 map({ "i", "s" }, "<C-e>", function()
 	ls.expand_or_jump(1)
