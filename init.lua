@@ -1,30 +1,30 @@
 -- =============================================================================
 --  GLOBALS
 -- =============================================================================
-vim.g.mapleader = " "
 
-vim.opt.guicursor = ""
-vim.opt.termguicolors = true
-vim.opt.background = "dark"
-vim.opt.winborder = "solid"
-vim.opt.cmdheight = 1
-vim.opt.showmode = true
-vim.opt.signcolumn = "number"
-vim.opt.cursorcolumn = false
-vim.opt.wrap = false
-vim.opt.number = true
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.showtabline = 4
-vim.opt.smartindent = true
-vim.opt.ignorecase = true
+vim.g.mapleader = " " -- espaco como leader key (tecla de comando)
+vim.opt.guicursor = "" -- deixa o cursor como block
+vim.opt.termguicolors = true -- altera as cores do tema do terminal
+vim.opt.background = "dark" -- tema escuro (inutil 99% das vezes)
+vim.opt.winborder = "solid" -- borda solida da janela de popup
+vim.opt.cmdheight = 1 -- 0 tira a altura da barra de comandos
+vim.opt.showmode = true -- mostra o modo (--insert--)
+vim.opt.signcolumn = "number" -- marcas git/lsp no lugar no nmr da linha
+vim.opt.cursorcolumn = false -- tira o highlight de coluna no mouse
+vim.opt.wrap = false -- desliga o wrap de linhas
+vim.opt.number = true -- liga o line number
+vim.opt.tabstop = 4 -- tamanho do tab em colunas, default 8
+vim.opt.shiftwidth = 4 -- tamanho das hotkeys << e >>
+vim.opt.showtabline = 1 -- quando mostrar a barra de tabs (2 sempre, 0 nunca)
+vim.opt.smartindent = true -- indent automatico no enter \n
+vim.opt.ignorecase = true -- trata letras com ou sem CAPS igualmente
 
-vim.opt.undofile = true
+vim.opt.undofile = true -- undo persistente
 
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 
-vim.cmd([[set noswapfile]])
-vim.cmd([[set mouse=]])
+vim.cmd([[set noswapfile]]) -- desativa o swapfile
+vim.cmd([[set mouse=]]) -- desativa o mouse
 
 vim.cmd([[set completeopt+=menuone,noselect,popup]])
 
@@ -117,6 +117,7 @@ configs.setup({
 		"cpp",
 		"c",
 		"proto",
+		"glsl",
 		"markdown",
 		"dockerfile",
 		"starlark",
@@ -169,6 +170,8 @@ require("mason-tool-installer").setup({
 		"cmakelang", -- CMake
 		"stylua", -- Lua
 		"pyright",
+		"glsl_analyzer",
+		"glslls",
 		"ruff",
 		"black", -- Python
 		"jdtls", -- Java
@@ -360,14 +363,17 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 local map = vim.keymap.set
 local ls = require("luasnip")
 local builtin = require("telescope.builtin")
+local opts = { noremap = true, silent = true }
 
+map("n", "<esc>", ":noh<cr>", opts)
 map({ "n", "x" }, "<leader>y", '"+y') -- Clipboard
 map({ "n", "x" }, "<leader>d", '"+d') -- Clipboard
 map({ "v", "x", "n" }, "<C-y>", '"+y', { desc = "System clipboard yank." })
 
 map("n", "<leader>w", "<Cmd>update<CR>", { desc = "Write buffer" })
-map("n", "<leader>q", "<Cmd>:quit<CR>", { desc = "Quit buffer" })
-map("n", "<leader>Q", "<Cmd>:wqa<CR>", { desc = "Quit all and write" })
+map("n", "<leader>q", "<Cmd>:bd<CR>", { desc = "Quit buffer" })
+map("n", "<leader>Q", "<Cmd>:quit<CR>", { desc = "Quit buffer" })
+-- map("n", "<leader>Q", "<Cmd>:wqa<CR>", { desc = "Quit all and write" })
 map("n", "<leader>O", "<Cmd>restart<CR>", { desc = "Restart vim" })
 map("n", "<leader>o", "<Cmd>source %<CR>", { desc = "Source current file" })
 
@@ -449,7 +455,7 @@ local function git_files()
 	builtin.find_files({ no_ignore = true })
 end
 
-map("n", "<leader>f", builtin.find_files, { desc = "Find files" })
+map("n", "<leader><leader>", builtin.find_files, { desc = "Find files" })
 map("n", "<leader>g", builtin.live_grep, { desc = "Live grep" })
 map("n", "<leader>sg", git_files, { desc = "Find all files (git ignored)" })
 map("n", "<leader>sb", builtin.buffers, { desc = "Buffers" })
@@ -486,35 +492,35 @@ map("n", "<M-m>", "<cmd>vertical resize -5<CR>")
 -- =============================================================================
 -- STATUSLINE
 -- =============================================================================
-_G.get_status_mode = function()
-	local modes = {
-		["n"] = "N",
-		["no"] = "N",
-		["v"] = "V",
-		["V"] = "V-L",
-		["\22"] = "V-B",
-		["s"] = "S",
-		["S"] = "S-L",
-		["\19"] = "S-B",
-		["i"] = "I",
-		["ic"] = "I",
-		["R"] = "R",
-		["Rv"] = "V-R",
-		["c"] = "CMD",
-		["cv"] = "V-EX",
-		["ce"] = "EX",
-		["r"] = "P",
-		["rm"] = "M",
-		["r?"] = "CFM",
-		["!"] = "SH",
-		["t"] = "TERM",
-	}
-	local current_mode = vim.api.nvim_get_mode().mode
-	return string.format("[%s]", modes[current_mode] or current_mode:upper())
-end
+-- _G.get_status_mode = function()
+-- 	local modes = {
+-- 		["n"] = "N",
+-- 		["no"] = "N",
+-- 		["v"] = "V",
+-- 		["V"] = "V-L",
+-- 		["\22"] = "V-B",
+-- 		["s"] = "S",
+-- 		["S"] = "S-L",
+-- 		["\19"] = "S-B",
+-- 		["i"] = "I",
+-- 		["ic"] = "I",
+-- 		["R"] = "R",
+-- 		["Rv"] = "V-R",
+-- 		["c"] = "CMD",
+-- 		["cv"] = "V-EX",
+-- 		["ce"] = "EX",
+-- 		["r"] = "P",
+-- 		["rm"] = "M",
+-- 		["r?"] = "CFM",
+-- 		["!"] = "SH",
+-- 		["t"] = "TERM",
+-- 	}
+-- 	local current_mode = vim.api.nvim_get_mode().mode
+-- 	return string.format("[%s]", modes[current_mode] or current_mode:upper())
+-- end
 
 local statusline = {
-	" %{v:lua.get_status_mode()} ",
+	-- " %{v:lua.get_status_mode()} ",
 	"%t", -- Filename
 	"%r", -- Readonly
 	"%m", -- Modified
