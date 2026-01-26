@@ -1,7 +1,3 @@
--- =============================================================================
---  GLOBALS
--- =============================================================================
-
 vim.g.mapleader = " " -- espaco como leader key (tecla de comando)
 vim.opt.guicursor = "" -- deixa o cursor como block
 vim.opt.termguicolors = true -- altera as cores do tema do terminal
@@ -30,21 +26,18 @@ vim.cmd([[set completeopt+=menuone,noselect,popup]])
 
 vim.cmd([[hi @lsp.type.number gui=italic]])
 
-local default_color = "doom-one"
+local default_color = "naysayer"
 
--- =============================================================================
---  PLUGINS
--- =============================================================================
 vim.pack.add({
 	{ src = "https://github.com/vague2k/vague.nvim" },
 	{ src = "https://github.com/christoomey/vim-tmux-navigator" },
 	{ src = "https://github.com/NTBBloodbath/doom-one.nvim" },
 	{ src = "https://github.com/m4xshen/autoclose.nvim" },
 	{ src = "https://github.com/rainglow/vim" },
-	{ src = "https://github.com/xiyaowong/transparent.nvim" },
+	-- { src = "https://github.com/xiyaowong/transparent.nvim" },
 	{ src = "https://github.com/Mofiqul/vscode.nvim" },
 	{ src = "https://github.com/elvessousa/sobrio" },
-	{ src = "https://github.com/NLKNguyen/papercolor-theme" },
+	{ src = "https://github.com/RostislavArts/naysayer.nvim" },
 	{ src = "https://github.com/darkvoid-theme/darkvoid.nvim" },
 	{ src = "https://github.com/nyoom-engineering/oxocarbon.nvim" },
 	{ src = "https://github.com/michaeljsmith/vim-colours-dark-lord" },
@@ -92,10 +85,6 @@ local function pack_clean()
 end
 
 vim.keymap.set("n", "<leader>pc", pack_clean)
-
--- =============================================================================
--- PLUGINS SETUP
--- =============================================================================
 
 require("luasnip").setup({ enable_autosnippets = true })
 require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })
@@ -171,7 +160,6 @@ require("mason-tool-installer").setup({
 		"stylua", -- Lua
 		"pyright",
 		"glsl_analyzer",
-		"glslls",
 		"ruff",
 		"black", -- Python
 		"jdtls", -- Java
@@ -189,18 +177,18 @@ require("mason-lspconfig").setup({
 	},
 })
 
--- Add color to cursor
-vim.g.doom_one_cursor_coloring = false
--- Set :terminal colors
-vim.g.doom_one_terminal_colors = false
--- Enable italic comments
-vim.g.doom_one_italic_comments = false
--- Enable TS support
-vim.g.doom_one_enable_treesitter = true
--- Color whole diagnostic text or only underline
-vim.g.doom_one_diagnostics_text_color = false
--- Enable transparent background
-vim.g.doom_one_transparent_background = true
+-- -- Add color to cursor
+-- vim.g.doom_one_cursor_coloring = false
+-- -- Set :terminal colors
+-- vim.g.doom_one_terminal_colors = true
+-- -- Enable italic comments
+-- vim.g.doom_one_italic_comments = false
+-- -- Enable TS support
+-- vim.g.doom_one_enable_treesitter = true
+-- -- Color whole diagnostic text or only underline
+-- vim.g.doom_one_diagnostics_text_color = false
+-- -- Enable transparent background
+-- vim.g.doom_one_transparent_background = true
 
 require("telescope").setup({
 	pickers = {
@@ -222,7 +210,6 @@ require("telescope").setup({
 			width = 400,
 			prompt_position = "top",
 			preview_cutoff = 40,
-			preview_width = 0.6,
 		},
 	},
 })
@@ -313,26 +300,27 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- MISC
 -- =============================================================================
 
-local color_group = vim.api.nvim_create_augroup("colors", { clear = true })
+-- local color_group = vim.api.nvim_create_augroup("colors", { clear = true })
 
 vim.cmd("colorscheme " .. default_color)
+--
 
-vim.api.nvim_create_autocmd("TabEnter", {
-	group = color_group,
-	callback = function(args)
-		if vim.t.color then
-			vim.cmd("colorscheme " .. vim.t.color)
-		else
-			vim.cmd("colorscheme " .. default_color)
-		end
-	end,
-})
-
-vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		vim.cmd("TransparentEnable")
-	end,
-})
+-- vim.api.nvim_create_autocmd("TabEnter", {
+-- 	group = color_group,
+-- 	callback = function(args)
+-- 		if vim.t.color then
+-- 			vim.cmd("colorscheme " .. vim.t.color)
+-- 		else
+-- 			vim.cmd("colorscheme " .. default_color)
+-- 		end
+-- 	end,
+-- })
+--
+-- vim.api.nvim_create_autocmd("VimEnter", {
+-- 	callback = function()
+-- 		vim.cmd("TransparentEnable")
+-- 	end,
+-- })
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
 	pattern = "*.jsx,*.tsx",
@@ -371,9 +359,9 @@ map({ "n", "x" }, "<leader>d", '"+d') -- Clipboard
 map({ "v", "x", "n" }, "<C-y>", '"+y', { desc = "System clipboard yank." })
 
 map("n", "<leader>w", "<Cmd>update<CR>", { desc = "Write buffer" })
-map("n", "<leader>q", "<Cmd>:bd<CR>", { desc = "Quit buffer" })
-map("n", "<leader>Q", "<Cmd>:quit<CR>", { desc = "Quit buffer" })
--- map("n", "<leader>Q", "<Cmd>:wqa<CR>", { desc = "Quit all and write" })
+-- map("n", "<leader>q", "<Cmd>:bd<CR>", { desc = "Quit buffer" })
+map("n", "<leader>q", "<Cmd>:quit<CR>", { desc = "Quit buffer" })
+map("n", "<leader>Q", "<Cmd>:wqa<CR>", { desc = "Quit all and write" })
 map("n", "<leader>O", "<Cmd>restart<CR>", { desc = "Restart vim" })
 map("n", "<leader>o", "<Cmd>source %<CR>", { desc = "Source current file" })
 

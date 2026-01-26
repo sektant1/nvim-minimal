@@ -36,6 +36,10 @@
       "rev": "57e5a8addb8c71fb063ee4acda466c7cf6ad2800",
       "src": "https://github.com/mason-org/mason.nvim"
     },
+    "naysayer.nvim": {
+      "rev": "6c641ea0cfc5fbbc0777996320b2304c3811f246",
+      "src": "https://github.com/RostislavArts/naysayer.nvim"
+    },
     "nvim-lspconfig": {
       "rev": "abf6d190f2c06818489c0bd4b926e7e3a06c5e51",
       "src": "https://github.com/neovim/nvim-lspconfig"
