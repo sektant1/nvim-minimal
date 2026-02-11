@@ -1,43 +1,51 @@
-vim.g.mapleader = " " -- espaco como leader key (tecla de comando)
-vim.opt.guicursor = "" -- deixa o cursor como block
-vim.opt.termguicolors = true -- altera as cores do tema do terminal
-vim.opt.background = "dark" -- tema escuro (inutil 99% das vezes)
-vim.opt.winborder = "solid" -- borda solida da janela de popup
-vim.opt.cmdheight = 1 -- 0 tira a altura da barra de comandos
-vim.opt.showmode = true -- mostra o modo (--insert--)
-vim.opt.signcolumn = "number" -- marcas git/lsp no lugar no nmr da linha
-vim.opt.cursorcolumn = false -- tira o highlight de coluna no mouse
-vim.opt.wrap = false -- desliga o wrap de linhas
-vim.opt.number = true -- liga o line number
-vim.opt.tabstop = 4 -- tamanho do tab em colunas, default 8
-vim.opt.shiftwidth = 4 -- tamanho das hotkeys << e >>
-vim.opt.showtabline = 1 -- quando mostrar a barra de tabs (2 sempre, 0 nunca)
-vim.opt.smartindent = true -- indent automatico no enter \n
-vim.opt.ignorecase = true -- trata letras com ou sem CAPS igualmente
-
-vim.opt.undofile = true -- undo persistente
+vim.g.mapleader = " "
+vim.opt.guicursor = ""
+vim.opt.termguicolors = true
+vim.opt.background = "dark"
+vim.opt.winborder = "solid"
+vim.opt.cmdheight = 1
+vim.opt.showmode = true
+vim.opt.signcolumn = "number"
+vim.opt.cursorcolumn = false
+vim.opt.wrap = false
+vim.opt.number = true
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.showtabline = 1
+vim.opt.smartindent = true
+vim.opt.ignorecase = true
+vim.opt.undofile = true
 
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 
-vim.cmd([[set noswapfile]]) -- desativa o swapfile
-vim.cmd([[set mouse=]]) -- desativa o mouse
-
+vim.cmd([[set noswapfile]])
+vim.cmd([[set mouse=]])
 vim.cmd([[set completeopt+=menuone,noselect,popup]])
-
 vim.cmd([[hi @lsp.type.number gui=italic]])
 
 local default_color = "naysayer"
 
+-- =============================================================================
+-- PLUGINS
+-- =============================================================================
 vim.pack.add({
-	{ src = "https://github.com/vague2k/vague.nvim" },
+	{ src = "https://github.com/dgrco/deepwater.nvim" },
+	-- { src = "https://github.com/sektant1/naysayer-colors.nvim" },
+	{ src = "https://github.com/RostislavArts/naysayer.nvim" },
+	{ src = "https://github.com/norcalli/nvim-colorizer.lua" },
+	{ src = "https://github.com/uhs-robert/oasis.nvim" },
+	{ src = "https://github.com/DeviusVim/deviuspro.nvim" },
 	{ src = "https://github.com/christoomey/vim-tmux-navigator" },
 	{ src = "https://github.com/NTBBloodbath/doom-one.nvim" },
 	{ src = "https://github.com/m4xshen/autoclose.nvim" },
 	{ src = "https://github.com/rainglow/vim" },
-	-- { src = "https://github.com/xiyaowong/transparent.nvim" },
+	{ src = "https://github.com/rafamadriz/friendly-snippets" },
+	-- { src = "https://github.com/skuzniar/cppgen.nvim" },
 	{ src = "https://github.com/Mofiqul/vscode.nvim" },
-	{ src = "https://github.com/elvessousa/sobrio" },
-	{ src = "https://github.com/RostislavArts/naysayer.nvim" },
+	{ src = "https://github.com/mfussenegger/nvim-dap" },
+	{ src = "https://github.com/nvim-neotest/nvim-nio" },
+	{ src = "https://github.com/rcarriga/nvim-dap-ui" },
+	{ src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
 	{ src = "https://github.com/darkvoid-theme/darkvoid.nvim" },
 	{ src = "https://github.com/nyoom-engineering/oxocarbon.nvim" },
 	{ src = "https://github.com/michaeljsmith/vim-colours-dark-lord" },
@@ -59,6 +67,9 @@ vim.pack.add({
 	{ src = "https://github.com/chomosuke/typst-preview.nvim" },
 })
 
+-- =============================================================================
+-- HELPERS
+-- =============================================================================
 local function pack_clean()
 	local active_plugins = {}
 	local unused_plugins = {}
@@ -84,39 +95,213 @@ local function pack_clean()
 	end
 end
 
-vim.keymap.set("n", "<leader>pc", pack_clean)
+local function cmake_root()
+	local buf = vim.api.nvim_get_current_buf()
+	local name = vim.api.nvim_buf_get_name(buf)
+	if name == "" then
+		return nil
+	end
 
+	local res = vim.fs.find("CMakeLists.txt", {
+		upward = true,
+		path = vim.fs.dirname(name),
+	})
+	return res[1] and vim.fs.dirname(res[1]) or nil
+end
+
+local function run(cmd)
+	vim.cmd("write")
+	vim.cmd("botright split | terminal " .. cmd)
+	vim.cmd("startinsert")
+end
+
+local function cmake_configure()
+	local root = cmake_root()
+	if not root then
+		vim.notify("CMakeLists.txt not found", vim.log.levels.ERROR)
+		return
+	end
+	run(
+		"cd "
+			.. root
+			.. " && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug"
+			.. " && (ln -sf build/compile_commands.json compile_commands.json || true)"
+	)
+end
+
+local function cmake_build()
+	local root = cmake_root()
+	if not root then
+		vim.notify("CMakeLists.txt not found", vim.log.levels.ERROR)
+		return
+	end
+	run("cd " .. root .. " && cmake --build build --parallel")
+end
+
+local function cmake_build_tests()
+	local root = cmake_root()
+	if not root then
+		vim.notify("CMakeLists.txt not found", vim.log.levels.ERROR)
+		return
+	end
+
+	run("cd " .. root .. " && cmake --build build --target tests --parallel")
+end
+
+local function cmake_rebuild()
+	local root = cmake_root()
+	if not root then
+		vim.notify("CMakeLists.txt not found", vim.log.levels.ERROR)
+		return
+	end
+	run(
+		"cd "
+			.. root
+			.. " && rm -rf build"
+			.. " && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug"
+			.. " && (ln -sf build/compile_commands.json compile_commands.json || true)"
+			.. " && cmake --build build --parallel"
+	)
+end
+local function write_file_if_missing(path, lines)
+	if vim.fn.filereadable(path) == 1 then
+		return false
+	end
+	vim.fn.writefile(lines, path)
+	return true
+end
+
+local function cmake_template_basic(project)
+	return {
+		"cmake_minimum_required(VERSION 3.16)",
+		"",
+		("project(%s LANGUAGES C CXX)"):format(project),
+		"",
+		"set(CMAKE_C_STANDARD 17)",
+		"set(CMAKE_CXX_STANDARD 20)",
+		"set(CMAKE_CXX_STANDARD_REQUIRED ON)",
+		"",
+		"set(CMAKE_EXPORT_COMPILE_COMMANDS ON)",
+		"",
+		"if(NOT CMAKE_BUILD_TYPE)",
+		'  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)',
+		"endif()",
+		"",
+		"file(GLOB_RECURSE SRC",
+		"  src/*.c",
+		"  src/*.cpp",
+		")",
+		"",
+		"add_executable(${PROJECT_NAME} ${SRC})",
+		"",
+		"target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)",
+	}
+end
+
+local function cmake_template_glfw_opengl(project)
+	return {
+		"cmake_minimum_required(VERSION 3.16)",
+		"",
+		("project(%s LANGUAGES C CXX)"):format(project),
+		"",
+		"set(CMAKE_C_STANDARD 17)",
+		"set(CMAKE_CXX_STANDARD 20)",
+		"set(CMAKE_CXX_STANDARD_REQUIRED ON)",
+		"",
+		"set(CMAKE_EXPORT_COMPILE_COMMANDS ON)",
+		"",
+		"if(NOT CMAKE_BUILD_TYPE)",
+		'  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)',
+		"endif()",
+		"",
+		"file(GLOB_RECURSE SRC",
+		"  src/*.c",
+		"  src/*.cpp",
+		")",
+		"",
+		"add_executable(${PROJECT_NAME} ${SRC})",
+		"",
+		"find_package(OpenGL REQUIRED)",
+		"find_package(glfw3 REQUIRED)",
+		"",
+		"target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::GL glfw)",
+		"target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)",
+		"",
+		"# Se você usa GLAD/GLEW, adicione aqui include dirs e sources da lib/loader.",
+	}
+end
+
+local function generate_cmakelists()
+	local cwd = vim.fn.getcwd()
+	local path = cwd .. "/CMakeLists.txt"
+	local project = vim.fn.fnamemodify(cwd, ":t")
+
+	if vim.fn.filereadable(path) == 1 then
+		vim.notify("CMakeLists.txt já existe", vim.log.levels.WARN)
+		return
+	end
+
+	local choices = {
+		"Basic (C/C++)",
+		"GLFW + OpenGL (system packages)",
+	}
+
+	vim.ui.select(choices, { prompt = "CMake template" }, function(choice)
+		if not choice then
+			return
+		end
+
+		local lines = nil
+		if choice == choices[1] then
+			lines = cmake_template_basic(project)
+		else
+			lines = cmake_template_glfw_opengl(project)
+		end
+
+		vim.fn.writefile(lines, path)
+		vim.notify("CMakeLists.txt criado", vim.log.levels.INFO)
+		vim.cmd("edit CMakeLists.txt")
+	end)
+end
+
+-- =============================================================================
+-- PLUGIN SETUP
+-- =============================================================================
 require("luasnip").setup({ enable_autosnippets = true })
 require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })
 
 require("autoclose").setup()
-require("nvim-treesitter").setup({
-	ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline", "python", "cpp" },
-	auto_install = true,
-	highlight = {
-		enable = true,
-		additional_vim_regex_highlighting = false,
-	},
-})
-local configs = require("nvim-treesitter")
 
+local configs = require("nvim-treesitter")
 configs.setup({
 	ensure_installed = {
 		"python",
 		"cpp",
 		"c",
+		"cmake",
 		"proto",
 		"glsl",
 		"markdown",
+		"markdown_inline",
 		"dockerfile",
-		"starlark",
+		"toml",
 		"bash",
 		"javascript",
 		"lua",
 	},
-	sync_install = false,
+	auto_install = true,
+	sync_install = true,
 	highlight = { enable = true },
 	indent = { enable = false },
+	incremental_selection = {
+		enable = true,
+		keymaps = {
+			init_selection = "<CR>",
+			node_incremental = "<CR>",
+			scope_incremental = "<BS>",
+			node_decremental = "<TAB>",
+		},
+	},
 })
 
 require("marks").setup({
@@ -153,53 +338,52 @@ require("mason-tool-installer").setup({
 	ensure_installed = {
 		"clangd",
 		"clang-format",
-		"codelldb", -- C/C++
+		"codelldb",
 		"cmake-language-server",
 		"marksman",
-		"cmakelang", -- CMake
-		"stylua", -- Lua
+		"cmakelang",
+		"stylua",
 		"pyright",
 		"glsl_analyzer",
 		"ruff",
-		"black", -- Python
-		"jdtls", -- Java
+		"black",
+		"jdtls",
 	},
 	auto_update = true,
 	run_on_start = true,
 })
 
+local lspconfig = require("lspconfig")
+local util = require("lspconfig.util")
+
 require("mason-lspconfig").setup({
 	ensure_installed = {},
 	handlers = {
 		function(server_name)
-			require("lspconfig")[server_name].setup({})
+			if server_name == "clangd" then
+				lspconfig.clangd.setup({
+					cmd = {
+						"clangd",
+						"--background-index",
+						"--clang-tidy",
+						"--completion-style=detailed",
+						"--header-insertion=never",
+						"--compile-commands-dir=build",
+					},
+					root_dir = util.root_pattern("compile_commands.json", "CMakeLists.txt", ".git"),
+				})
+				return
+			end
+			lspconfig[server_name].setup({})
 		end,
 	},
 })
-
--- -- Add color to cursor
--- vim.g.doom_one_cursor_coloring = false
--- -- Set :terminal colors
--- vim.g.doom_one_terminal_colors = true
--- -- Enable italic comments
--- vim.g.doom_one_italic_comments = false
--- -- Enable TS support
--- vim.g.doom_one_enable_treesitter = true
--- -- Color whole diagnostic text or only underline
--- vim.g.doom_one_diagnostics_text_color = false
--- -- Enable transparent background
--- vim.g.doom_one_transparent_background = true
-
 require("telescope").setup({
 	pickers = {
-		colorscheme = {
-			enable_preview = true,
-		},
+		colorscheme = { enable_preview = true, previewer = true },
 	},
 	defaults = {
-		preview = {
-			treesitter = false,
-		},
+		preview = { treesitter = false },
 		color_devicons = true,
 		sorting_strategy = "ascending",
 		borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
@@ -209,7 +393,7 @@ require("telescope").setup({
 			height = 100,
 			width = 400,
 			prompt_position = "top",
-			preview_cutoff = 40,
+			preview_cutoff = 60,
 		},
 	},
 })
@@ -220,48 +404,133 @@ require("actions-preview").setup({
 	telescope = vim.tbl_extend("force", require("telescope.themes").get_dropdown(), {}),
 })
 
-vim.diagnostic.config({
-	float = { border = "solid" },
-})
+vim.diagnostic.config({ float = { border = "solid" } })
 
 -- =============================================================================
--- LSP SETUP & AUTOCOMMANDS
+-- DAP (C/C++ via codelldb)
 -- =============================================================================
-local function find_cmake_root(path)
-	local res = vim.fs.find("CMakeLists.txt", {
-		upward = true,
-		path = vim.fs.dirname(path),
-	})
-	return res[1] and vim.fs.dirname(res[1]) or nil
+local dap_ok, dap = pcall(require, "dap")
+if not dap_ok then
+	return
 end
 
-local function sync_project()
-	local buf = vim.api.nvim_get_current_buf()
-	local name = vim.api.nvim_buf_get_name(buf)
-	if name == "" then
-		return
-	end
-
-	local root = find_cmake_root(name)
-	if not root then
-		return
-	end
-
-	-- Neovim cwd
-	vim.cmd("lcd " .. root)
-
-	-- Push to tmux (force + silent)
-	vim.fn.system({
-		"tmux",
-		"set-option",
-		"-gq",
-		"@project_root",
-		root,
-	})
+local dapui_ok, dapui = pcall(require, "dapui")
+if dapui_ok then
+	dapui.setup()
 end
 
-vim.api.nvim_create_autocmd({ "BufEnter", "BufFilePost" }, { callback = sync_project })
+pcall(function()
+	require("nvim-dap-virtual-text").setup({ commented = true })
+end)
 
+vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DiagnosticError", linehl = "", numhl = "" })
+vim.fn.sign_define("DapStopped", { text = "▶", texthl = "DiagnosticWarn", linehl = "", numhl = "" })
+
+local function codelldb_path()
+	local mason = vim.fn.stdpath("data") .. "/mason"
+	local ext = (vim.loop.os_uname().sysname:match("Windows")) and ".exe" or ""
+	return mason .. "/packages/codelldb/extension/adapter/codelldb" .. ext
+end
+
+dap.adapters.codelldb = {
+	type = "server",
+	port = "${port}",
+	executable = {
+		command = codelldb_path(),
+		args = { "--port", "${port}" },
+	},
+}
+
+local function is_file(path)
+	local stat = vim.loop.fs_stat(path)
+	return stat and stat.type == "file"
+end
+
+local function list_build_executables(root)
+	local build = root .. "/build"
+	local paths = vim.fn.globpath(build, "**/*", false, true)
+	local out = {}
+
+	for _, p in ipairs(paths) do
+		if is_file(p) and vim.fn.executable(p) == 1 then
+			-- filtra alguns arquivos comuns que não são “app”
+			if not p:match("%.so$") and not p:match("%.a$") and not p:match("%.o$") then
+				table.insert(out, p)
+			end
+		end
+	end
+
+	table.sort(out)
+	return out
+end
+
+local function pick_executable()
+	local root = cmake_root() or vim.fn.getcwd()
+	local exes = list_build_executables(root)
+
+	if #exes == 0 then
+		local guess = root .. "/build/"
+		return vim.fn.input("Executable: ", guess, "file")
+	end
+
+	local choice = nil
+	vim.ui.select(exes, { prompt = "Pick executable" }, function(item)
+		choice = item
+	end)
+
+	if not choice then
+		choice = exes[#exes]
+	end
+
+	vim.g.last_cmake_exe = choice
+	return choice
+end
+
+dap.configurations.cpp = {
+	{
+		name = "Launch (codelldb)",
+		type = "codelldb",
+		request = "launch",
+		program = pick_executable,
+		cwd = "${workspaceFolder}",
+		stopOnEntry = false,
+		args = {},
+	},
+	{
+		name = "Launch (codelldb, terminal)",
+		type = "codelldb",
+		request = "launch",
+		program = pick_executable,
+		cwd = "${workspaceFolder}",
+		stopOnEntry = false,
+		args = {},
+		runInTerminal = true,
+	},
+	{
+		name = "Attach (pick process)",
+		type = "codelldb",
+		request = "attach",
+		pid = require("dap.utils").pick_process,
+		cwd = "${workspaceFolder}",
+	},
+}
+dap.configurations.c = dap.configurations.cpp
+
+if dapui_ok then
+	dap.listeners.after.event_initialized["dapui_config"] = function()
+		dapui.open()
+	end
+	dap.listeners.before.event_terminated["dapui_config"] = function()
+		dapui.close()
+	end
+	dap.listeners.before.event_exited["dapui_config"] = function()
+		dapui.close()
+	end
+end
+
+-- =============================================================================
+-- LSP
+-- =============================================================================
 vim.lsp.enable({
 	"cssls",
 	"clangd",
@@ -270,6 +539,15 @@ vim.lsp.enable({
 	"hlint",
 	"jdtls",
 	"cmake-language-server",
+})
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+	pattern = "*",
+	callback = function()
+		if vim.bo.filetype == "" then
+			vim.cmd("filetype detect")
+		end
+	end,
 })
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -297,31 +575,8 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 -- =============================================================================
--- MISC
+-- AUTOCOMMANDS
 -- =============================================================================
-
--- local color_group = vim.api.nvim_create_augroup("colors", { clear = true })
-
-vim.cmd("colorscheme " .. default_color)
---
-
--- vim.api.nvim_create_autocmd("TabEnter", {
--- 	group = color_group,
--- 	callback = function(args)
--- 		if vim.t.color then
--- 			vim.cmd("colorscheme " .. vim.t.color)
--- 		else
--- 			vim.cmd("colorscheme " .. default_color)
--- 		end
--- 	end,
--- })
---
--- vim.api.nvim_create_autocmd("VimEnter", {
--- 	callback = function()
--- 		vim.cmd("TransparentEnable")
--- 	end,
--- })
-
 vim.api.nvim_create_autocmd("BufWinEnter", {
 	pattern = "*.jsx,*.tsx",
 	group = vim.api.nvim_create_augroup("TS", { clear = true }),
@@ -345,21 +600,93 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 	end,
 })
 
+vim.api.nvim_create_user_command("CheckBuildTools", function()
+	local function ok(bin)
+		return vim.fn.executable(bin) == 1
+	end
+
+	local missing = {}
+	local tools = { "cmake", "ninja", "gdb", "lldb" }
+	for _, t in ipairs(tools) do
+		if not ok(t) then
+			table.insert(missing, t)
+		end
+	end
+
+	if #missing == 0 then
+		vim.notify("Build/debug tools OK: cmake/ninja/gdb/lldb", vim.log.levels.INFO)
+	else
+		vim.notify("Missing tools: " .. table.concat(missing, ", "), vim.log.levels.WARN)
+	end
+end, {})
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	pattern = { "*.vert", "*.frag", "*.geom", "*.comp", "*.tesc", "*.tese", "*.glsl" },
+	callback = function()
+		vim.bo.filetype = "glsl"
+	end,
+})
+
 -- =============================================================================
--- KEYMAPPINGS
+-- KEYMAPS
 -- =============================================================================
 local map = vim.keymap.set
 local ls = require("luasnip")
 local builtin = require("telescope.builtin")
 local opts = { noremap = true, silent = true }
 
+map("n", "<leader>pc", pack_clean)
+
+map("n", "<leader>cc", cmake_configure, { desc = "CMake configure (Debug)" })
+map("n", "<leader>cb", cmake_build, { desc = "CMake build" })
+map("n", "<leader>ct", cmake_build_tests, { desc = "CMake build tests target" })
+map("n", "<leader>cr", cmake_rebuild, { desc = "CMake rebuild (clean)" })
+map("n", "<leader>cg", generate_cmakelists, { desc = "Generate CMakeLists.txt template" })
+
+map("n", "<leader>bb", function()
+	dap.toggle_breakpoint()
+end, { desc = "DAP breakpoint" })
+map("n", "<leader>bB", function()
+	dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+end, { desc = "DAP conditional breakpoint" })
+map("n", "<leader>bc", function()
+	dap.continue()
+end, { desc = "DAP continue" })
+map("n", "<leader>bn", function()
+	dap.step_over()
+end, { desc = "DAP step over" })
+map("n", "<leader>bi", function()
+	dap.step_into()
+end, { desc = "DAP step into" })
+map("n", "<leader>bo", function()
+	dap.step_out()
+end, { desc = "DAP step out" })
+map("n", "<leader>br", function()
+	dap.repl.open()
+end, { desc = "DAP repl" })
+map("n", "<leader>bR", function()
+	local exe = vim.g.last_cmake_exe
+	if not exe or exe == "" then
+		exe = pick_executable()
+	end
+	run(exe)
+end, { desc = "Run last executable" })
+
+map("n", "<leader>bl", function()
+	cmake_build()
+end, { desc = "Build (then run manually with <leader>rr)" })
+if dapui_ok then
+	map("n", "<leader>bu", function()
+		dapui.toggle()
+	end, { desc = "DAP UI toggle" })
+end
+
 map("n", "<esc>", ":noh<cr>", opts)
-map({ "n", "x" }, "<leader>y", '"+y') -- Clipboard
-map({ "n", "x" }, "<leader>d", '"+d') -- Clipboard
+map({ "n", "x" }, "<leader>y", '"+y')
+map({ "n", "x" }, "<leader>D", '"+d')
 map({ "v", "x", "n" }, "<C-y>", '"+y', { desc = "System clipboard yank." })
 
 map("n", "<leader>w", "<Cmd>update<CR>", { desc = "Write buffer" })
--- map("n", "<leader>q", "<Cmd>:bd<CR>", { desc = "Quit buffer" })
 map("n", "<leader>q", "<Cmd>:quit<CR>", { desc = "Quit buffer" })
 map("n", "<leader>Q", "<Cmd>:wqa<CR>", { desc = "Quit all and write" })
 map("n", "<leader>O", "<Cmd>restart<CR>", { desc = "Restart vim" })
@@ -396,15 +723,12 @@ map({ "n", "v", "x" }, "<leader>n", ":norm ", { desc = "Run normal command" })
 vim.keymap.set("n", "<M-b>", function()
 	vim.fn.system({ "tmux", "send-keys", "M-b" })
 end)
-
 vim.keymap.set("n", "<M-r>", function()
 	vim.fn.system({ "tmux", "send-keys", "M-r" })
 end)
-
 vim.keymap.set("n", "<M-d>", function()
 	vim.fn.system({ "tmux", "send-keys", "M-d" })
 end)
-
 vim.keymap.set("n", "<M-t>", function()
 	vim.fn.system({ "tmux", "send-keys", "M-t" })
 end)
@@ -429,7 +753,7 @@ for i = 1, 8 do
 	map({ "n", "t" }, "<Leader>" .. i, "<Cmd>tabnext " .. i .. "<CR>")
 end
 
-map({ "n" }, "<leader>e", "<cmd>Yazi<CR>")
+map("n", "<leader>e", "<cmd>Yazi<CR>")
 map("n", "<C-f>", "<Cmd>Open .<CR>", { desc = "Open in OS Finder" })
 map("n", "<leader>a", ":edit #<CR>", { desc = "Edit alternate file" })
 
@@ -478,43 +802,22 @@ map("n", "<M-i>", "<cmd>vertical resize +5<CR>")
 map("n", "<M-m>", "<cmd>vertical resize -5<CR>")
 
 -- =============================================================================
--- STATUSLINE
+-- UI
 -- =============================================================================
--- _G.get_status_mode = function()
--- 	local modes = {
--- 		["n"] = "N",
--- 		["no"] = "N",
--- 		["v"] = "V",
--- 		["V"] = "V-L",
--- 		["\22"] = "V-B",
--- 		["s"] = "S",
--- 		["S"] = "S-L",
--- 		["\19"] = "S-B",
--- 		["i"] = "I",
--- 		["ic"] = "I",
--- 		["R"] = "R",
--- 		["Rv"] = "V-R",
--- 		["c"] = "CMD",
--- 		["cv"] = "V-EX",
--- 		["ce"] = "EX",
--- 		["r"] = "P",
--- 		["rm"] = "M",
--- 		["r?"] = "CFM",
--- 		["!"] = "SH",
--- 		["t"] = "TERM",
--- 	}
--- 	local current_mode = vim.api.nvim_get_mode().mode
--- 	return string.format("[%s]", modes[current_mode] or current_mode:upper())
--- end
+vim.cmd("colorscheme " .. default_color)
+vim.api.nvim_set_hl(0, "Operator", { fg = "#FFFFFF" })
+vim.api.nvim_set_hl(0, "@operator.cpp", { fg = "#FFFFFF", bold = true })
+-- vim.api.nvim_set_hl(0, "@symbol.cpp", { fg = "#FFFFFF", bold = true })
+vim.cmd("hi Operator guifg=#FFFFFF")
+vim.cmd("hi cppOperator guifg=#FFFFFF")
 
 local statusline = {
-	-- " %{v:lua.get_status_mode()} ",
-	"%t", -- Filename
-	"%r", -- Readonly
-	"%m", -- Modified
-	"%=", -- Spacer
+	"%t",
+	"%r",
+	"%m",
+	"%=",
 	"%{&filetype}",
-	" %2p%%", -- Percentage
-	" %3l:%-2c ", -- Line:Col
+	" %2p%%",
+	" %3l:%-2c ",
 }
 vim.o.statusline = table.concat(statusline, "")
