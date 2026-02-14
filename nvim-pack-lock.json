@@ -20,6 +20,10 @@
       "rev": "ecbb86a3ac75f21e361595d9468e9fa017b7aa58",
       "src": "https://github.com/uloco/bluloco.nvim"
     },
+    "conform.nvim": {
+      "rev": "c2526f1cde528a66e086ab1668e996d162c75f4f",
+      "src": "https://github.com/stevearc/conform.nvim"
+    },
     "darkvoid.nvim": {
       "rev": "45be993a5617e05811b6b293c05e6aded7003cc9",
       "src": "https://github.com/darkvoid-theme/darkvoid.nvim"
@@ -149,6 +153,10 @@
     "vscode.nvim": {
       "rev": "aa1102a7e15195c9cca22730b09224a7f7745ba8",
       "src": "https://github.com/Mofiqul/vscode.nvim"
+    },
+    "which-key.nvim": {
+      "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
+      "src": "https://github.com/folke/which-key.nvim"
     },
     "yazi.nvim": {
       "rev": "3e434d9aa8a751f9504fae314f3a6baf6953235c",
