@@ -33,7 +33,7 @@ map("n", "Y", "_y$", { desc = "Yank to end of line" })
 map("n", "D", "_d$", { desc = "Delete to end of line" })
 map("v", "H", "^", { desc = "Start of line" })
 map("v", "L", "$", { desc = "End of line" })
-map("x", "<leader>r", [["_dP]], { desc = "Replace selection with buffer" })
+map("x", "<leader>p", [["_dP]], { desc = "Replace selection with buffer" })
 map("v", "p", '"_dP', opts)
 
 map("n", "<C-d>", "<C-d>zz")
@@ -44,7 +44,7 @@ map("n", "N", "Nzzzv")
 map({ "n", "v", "x" }, ";", ":", { desc = "Command mode" })
 map({ "n", "v", "x" }, ":", ";", { desc = "Repeat last f/t" })
 map({ "n", "v", "x" }, "<C-s>", [[:s/\V]], { desc = "Substitute in selection" })
-map({ "n", "v", "x" }, "<leader>n", ":norm ", { desc = "Run normal command" })
+-- map({ "n", "v", "x" }, "<leader>n", ":norm ", { desc = "Run normal command" })
 
 -- tmux passthrough
 vim.keymap.set("n", "<M-b>", function()
@@ -59,10 +59,6 @@ end)
 vim.keymap.set("n", "<M-t>", function()
 	vim.fn.system({ "tmux", "send-keys", "M-t" })
 end)
-
-vim.keymap.set("i", "<Tab>", function()
-	return vim.fn.pumvisible() == 1 and "<C-y>" or "<Tab>"
-end, { expr = true, silent = true, desc = "Accept completion or insert Tab" })
 
 -- tabs
 map({ "n", "t" }, "<leader>tn", "<Cmd>tabnew<CR>", { desc = "Tab new" })
@@ -83,7 +79,7 @@ map("n", "<C-f>", "<Cmd>Open .<CR>", { desc = "Open in OS Finder" })
 map("n", "<leader>a", ":edit #<CR>", { desc = "Edit alternate file" })
 
 -- LSP / diagnostics / quickfix
-map({ "n", "v", "x" }, "<leader>lf", vim.lsp.buf.format, { desc = "Format buffer" })
+-- map({ "n", "v", "x" }, "<leader>lf", vim.lsp.buf.format, { desc = "Format buffer" })
 map("n", "<C-q>", ":copen<CR>", { silent = true })
 map("n", "<leader>d", function()
 	vim.diagnostic.open_float()

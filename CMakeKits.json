@@ -1,0 +1,14 @@
+[
+  {
+    "name": "std compilation kit",
+
+    "generator": "Ninja",
+
+    "compilers": {
+      "C": "/usr/bin/gcc",
+      "CXX": "/usr/bin/g++",
+    },
+    "linker": "/usr/bin/lld",
+    "toochainFile": "xxx"
+  }
+]
